@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ MrOMG 🎧</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="styles/app.css">
+    <link rel="icon" href="djLogo\favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="djLogo\favicon-32x32.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="djLogo\favicon-16x16.png" type="image/png" sizes="16x16" />
+</head>
+
+<body>
+    <!-- Intro Overlay -->
+    <div id="intro-overlay">
+        <canvas id="intro-canvas"></canvas>
+        <div id="intro-text">
+            <h1>Welcome DJ MrOMG!</h1>
+            <p>Loading your decks...</p>
+        </div>
+    </div>
+
+    <!-- First Run Modal -->
+    <div id="first-run-modal" class="modal">
+        <div class="modal-content">
+            <h2>🎧 Let's Build Your Crate!</h2>
+            <p>Add 10-15 of your favorite tracks to get started</p>
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-text">
+                    📁 Drag & Drop MP3/WAV files here<br>
+                    or click below to browse
+                </div>
+            </div>
+            <input type="file" id="first-run-input" multiple accept="audio/*" style="display: none;">
+            <button class="upload-btn" onclick="document.getElementById('first-run-input').click()">
+                Choose Files
+            </button>
+            <div id="song-preview" class="song-list-preview"></div>
+            <button id="done-btn" class="modal-btn" style="display: none;">Done - Start Mixing! 🎛️</button>
+        </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="app-header">
+        <h1>🎧 DJ MrOMG Booth</h1>
+        <p>Load your music. Mix your vibe.</p>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="dj-interface">
+        <!-- Booth Container -->
+        <div class="booth-container">
+            <!-- Deck A -->
+            <div class="deck" id="left-deck">
+                <div class="deck-header">
+                    <div class="deck-label">DECK A</div>
+                    <div class="song-display" id="left-song">No track loaded</div>
+                </div>
+
+                <div class="turntable-layout">
+                    <!-- Waveform -->
+                    <div class="waveform-container">
+                        <div class="waveform-label">WAVEFORM</div>
+                        <canvas class="waveform-vertical" id="left-waveform"></canvas>
+                        <div class="bpm-display" id="left-bpm">BPM: --</div>
+                    </div>
+
+                    <!-- Jog Wheel -->
+                    <div class="jog-container">
+                        <div class="jog-wheel" id="left-jog"></div>
+                    </div>
+
+                    <!-- Pitch Control -->
+                    <div class="pitch-container">
+                        <div class="pitch-label">PITCH</div>
+                        <input type="range" class="pitch-slider" id="left-pitch" min="-12" max="12" value="0"
+                            step="0.1">
+                        <div class="pitch-value" id="left-pitch-value">0%</div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="time-display">
+                        <span id="left-current">0:00</span>
+                        <span id="left-duration">0:00</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="left-progress"></div>
+                    </div>
+                </div>
+
+                <div class="deck-controls">
+                    <button class="control-btn cue-btn" id="left-cue">⏮</button>
+                    <button class="control-btn play-btn" id="left-play">▶</button>
+                </div>
+
+                <div class="hot-cues">
+                    <button class="hot-cue" data-cue="0">1</button>
+                    <button class="hot-cue" data-cue="1">2</button>
+                    <button class="hot-cue" data-cue="2">3</button>
+                    <button class="hot-cue" data-cue="3">4</button>
+                </div>
+            </div>
+
+            <!-- Deck B -->
+            <div class="deck" id="right-deck">
+                <div class="deck-header">
+                    <div class="deck-label">DECK B</div>
+                    <div class="song-display" id="right-song">No track loaded</div>
+                </div>
+
+                <div class="turntable-layout">
+                    <!-- Waveform -->
+                    <div class="waveform-container">
+                        <div class="waveform-label">WAVEFORM</div>
+                        <canvas class="waveform-vertical" id="right-waveform"></canvas>
+                        <div class="bpm-display" id="right-bpm">BPM: --</div>
+                    </div>
+
+                    <!-- Jog Wheel -->
+                    <div class="jog-container">
+                        <div class="jog-wheel" id="right-jog"></div>
+                    </div>
+
+                    <!-- Pitch Control -->
+                    <div class="pitch-container">
+                        <div class="pitch-label">PITCH</div>
+                        <input type="range" class="pitch-slider" id="right-pitch" min="-12" max="12" value="0"
+                            step="0.1">
+                        <div class="pitch-value" id="right-pitch-value">0%</div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="time-display">
+                        <span id="right-current">0:00</span>
+                        <span id="right-duration">0:00</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="right-progress"></div>
+                    </div>
+                </div>
+
+                <div class="deck-controls">
+                    <button class="control-btn cue-btn" id="right-cue">⏮</button>
+                    <button class="control-btn play-btn" id="right-play">▶</button>
+                </div>
+
+                <div class="hot-cues">
+                    <button class="hot-cue" data-cue="0">5</button>
+                    <button class="hot-cue" data-cue="1">6</button>
+                    <button class="hot-cue" data-cue="2">7</button>
+                    <button class="hot-cue" data-cue="3">8</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Mixer -->
+            <div class="mixer">
+                <h3>🎛️ MIXER</h3>
+                <div class="crossfader-section">
+                    <div class="crossfader-label">CROSSFADER</div>
+                    <input type="range" class="crossfader" id="crossfader" min="0" max="100" value="50">
+                </div>
+                <div class="volume-controls">
+                    <div class="volume-control">
+                        <label>DECK A</label>
+                        <input type="range" class="volume-slider" id="left-volume" min="0" max="100" value="100">
+                    </div>
+                    <div class="volume-control">
+                        <label>DECK B</label>
+                        <input type="range" class="volume-slider" id="right-volume" min="0" max="100" value="100">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Transitions -->
+            <div class="transitions">
+                <h3>🎚️ Quick Transitions</h3>
+                <div class="transition-buttons">
+                    <button class="transition-btn" onclick="autoSync()">⚡ Sync BPM</button>
+                    <button class="transition-btn" onclick="smoothTransition(8)">🌊 Smooth (8s)</button>
+                    <button class="transition-btn" onclick="quickCut('left')">⬅️ Cut to A</button>
+                    <button class="transition-btn" onclick="quickCut('right')">➡️ Cut to B</button>
+                    <button class="transition-btn" onclick="fadeOut('left', 4)">🔇 Fade A</button>
+                    <button class="transition-btn" onclick="fadeOut('right', 4)">🔇 Fade B</button>
+                </div>
+            </div>
+
+            <!-- MP3 DOWNLOADER SECTION -->
+            <div class="downloader">
+                <h3>📥 MP3 Downloader</h3>
+
+                <!-- Browser Tabs -->
+                <div class="downloader-tabs">
+                    <button class="downloader-tab" onclick="switchDownloaderTab('youtube')">
+                        🎥 YouTube
+                    </button>
+                    <button class="downloader-tab" onclick="switchDownloaderTab('music')">
+                        🎵 Music
+                    </button>
+                </div>
+
+                <!-- YouTube Tab -->
+                <div class="downloader-content" id="youtube-tab" style="display: none;">
+                    <button class="downloader-close" onclick="closeDownloaderTabs()">✕</button>
+                    <div class="browser-preview">
+                        <div class="browser-icon">🎥</div>
+                        <div class="browser-title">YouTube</div>
+                        <div class="browser-desc">Browse millions of music videos</div>
+                    </div>
+                    <button class="browser-btn" onclick="window.open('https://www.youtube.com', '_blank')">
+                        Open YouTube →
+                    </button>
+                </div>
+
+                <!-- YouTube Music Tab -->
+                <div class="downloader-content" id="music-tab" style="display: none;">
+                    <button class="downloader-close" onclick="closeDownloaderTabs()">✕</button>
+                    <div class="browser-preview">
+                        <div class="browser-icon">🎵</div>
+                        <div class="browser-title">YouTube Music</div>
+                        <div class="browser-desc">Discover and stream music</div>
+                    </div>
+                    <button class="browser-btn" onclick="window.open('https://music.youtube.com', '_blank')">
+                        Open YouTube Music →
+                    </button>
+                </div>
+
+                <!-- Download Section (always visible) -->
+                <div class="download-section">
+                    <div class="downloader-input">
+                        <input type="text" id="yt-url" placeholder="Paste YouTube URL..." />
+                        <button class="download-btn" id="download-btn" onclick="startYTDownload()">Download</button>
+                    </div>
+
+                    <div class="download-progress" id="download-progress" style="display: none;">
+                        <div class="download-status" id="download-status">Starting...</div>
+                        <div class="download-bar">
+                            <div class="download-fill" id="download-fill"></div>
+                        </div>
+                        <div class="download-percent" id="download-percent">0%</div>
+                    </div>
+
+                    <div class="download-complete" id="download-complete" style="display: none;">
+                        <div class="download-success">✓ Download Complete!</div>
+                        <button class="add-to-crate-btn" id="add-to-crate-btn" onclick="addDownloadedTrack()">
+                            + Add to Crate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Library -->
+            <div class="library">
+                <div class="library-header">
+                    <h3>🎶 Your Crate</h3>
+                    <input type="file" id="library-input" multiple accept="audio/*" style="display: none;">
+                    <button class="upload-btn" onclick="document.getElementById('library-input').click()">+ Add</button>
+                </div>
+                <div class="song-list" id="song-list"></div>
+                <div class="empty-state" id="empty-state">
+                    <p>No tracks yet. Add some music!</p>
+                </div>
+            </div>
+        </div>
+        <!-- Help Button -->
+        <button id="help-btn" title="Help / Instructions">🎁</button>
+        <!-- Help / Instructions Modal -->
+        <div id="help-modal" class="help-modal">
+            <div class="help-content">
+                <button class="help-close" onclick="toggleHelp()">✕</button>
+
+                <h2>🎧 DJ MrOMG Help Guide</h2>
+                <p class="birthday">
+                    🎉 Happy Birthday, Dad! 🥳<br><br>
+                    "Mike, I wasn`t even gonna tell you this... but this aint the first time we done this.. our souls are bounded"<br><br>
+                    It’s honestly been a wild, wild year, and I just want you to know how much I appreciate you.
+                    I’m so proud of everything you do and how hard you work every single day.
+                    Even though you get on my nerves sometimes (just a little 😅), I love you more than anything.
+                    Thank you for always supporting me, believing in me, and letting me do the things I love —
+                    including building stuff like this DJ booth.
+                    I hope today is full of good vibes, great music, and I hope this little project brings a smile to
+                    your face.
+                    Love you always ❤️🎧
+                </p>
+
+                <section>
+                    <h3>🎵 Loading Music</h3>
+                    <ul>
+                        <li>Use <strong>“+ Add”</strong> in the Crate to upload MP3/WAV files</li>
+                        <li>Click A or B to load a track</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>🎚️ Deck Controls</h3>
+                    <ul>
+                        <li><strong>▶ Play</strong> – Start / pause the track</li>
+                        <li><strong>⏮ Cue</strong> – Jump back to cue point</li>
+                        <li><strong>Jog Wheel</strong> – Scratch / nudge the track</li>
+                        <li><strong>Pitch Slider</strong> – Adjust BPM manually</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>🔥 Hot Cues</h3>
+                    <ul>
+                        <li>Set hot by pressing <strong>LEFT SHIFT + 1-8</strong></li>
+                        <li>Deck A uses hot cues <strong>1–4</strong></li>
+                        <li>Deck B uses hot cues <strong>5–8</strong></li>
+                        <li>Instantly jump to saved cue points</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>🎛️ Mixer</h3>
+                    <ul>
+                        <li><strong>Crossfader</strong> – Blend between Deck A and B</li>
+                        <li><strong>Volume sliders</strong> – Control deck loudness</li>
+                        <li>Center = both decks equal</li>
+                        <li>Left = only Deck A audible</li>
+                        <li>Right = only Deck B audible</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>⚡ Quick Transitions</h3>
+                    <ul>
+                        <li><strong>Sync BPM</strong> – Match both deck tempos</li>
+                        <li><strong>Smooth</strong> – Automatic fade transition</li>
+                        <li><strong>Cut to A/B</strong> – Instant switch</li>
+                        <li><strong>Fade A/B</strong> – Fade out a deck smoothly</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>📥 MP3 Downloader</h3>
+                    <ul>
+                        <li>Search for songs or paste a YouTube URL</li>
+                        <li>Download audio and add it directly to your crate</li>
+                        <li>YouTube & YouTube Music supported</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>🛞Jog Wheels</h3>
+                    <p>Click and drag the jog wheels to scratch or nudge tracks. Press play again to resume normal playback.</p>
+                </section>
+                <section>
+                    <h3>❓ Need Help?</h3>
+                    <p>If you're ever lost, just click the <strong>?</strong> button again.</p>
+                </section>
+            </div>
+        </div>
+
+    </div>
+    <script type="module" src="scripts/library.js"></script>
+    <script type="module" src="scripts/booth.js"></script>
+    <script src="scripts/firstRun.js"></script>
+    <script type="module" src="scripts/bpm.js"></script>
+    <script src="scripts/downloader.js"></script>
+    <script> if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('[SW] Registered'))
+                .catch(err => console.error('[SW] Registration failed:', err));
+        }
+    </script>
+    <script>
+        function toggleHelp() {
+            const modal = document.getElementById('help-modal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        document.getElementById('help-btn').addEventListener('click', toggleHelp);
+    </script>
+
+</body>
+
+</html>
